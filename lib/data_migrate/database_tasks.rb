@@ -28,7 +28,7 @@ module DataMigrate
     end
 
     def self.data_migrations_path
-      DataMigrate.config.data_migrations_path
+      DataMigrate.config.data_migrations_paths
     end
 
     def self.schema_migrations_path

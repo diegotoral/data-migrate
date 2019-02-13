@@ -147,19 +147,25 @@ namespace :db do
         )
         file_list = []
 
-        Dir.foreach(File.join(Rails.root, data_migrations_path)) do |file|
-          # only files matching "20091231235959_some_name.rb" pattern
-          if match_data = /(\d{14})_(.+)\.rb/.match(file)
-            status = db_list_data.delete(match_data[1]) ? 'up' : 'down'
-            file_list << [status, match_data[1], match_data[2], 'data']
+        data_migrations_path.each do |path|
+          Dir.foreach(File.join(Rails.root, path)) do |file|
+            # only files matching "20091231235959_some_name.rb" pattern
+            if match_data = /(\d{14})_(.+)\.rb/.match(file)
+              status = db_list_data.delete(match_data[1]) ? 'up' : 'down'
+              file_list << [status, match_data[1], match_data[2], 'data']
+            end
           end
         end
 
-        Dir.foreach(File.join(Rails.root, 'db', 'migrate')) do |file|
-          # only files matching "20091231235959_some_name.rb" pattern
-          if match_data = /(\d{14})_(.+)\.rb/.match(file)
-            status = db_list_schema.delete(match_data[1]) ? 'up' : 'down'
-            file_list << [status, match_data[1], match_data[2], 'schema']
+        rails_migrations_path = File.join(Rails.root, 'db', 'migrate')
+
+        if File.exists?(rails_migrations_path)
+          Dir.foreach(rails_migrations_path) do |file|
+            # only files matching "20091231235959_some_name.rb" pattern
+            if match_data = /(\d{14})_(.+)\.rb/.match(file)
+              status = db_list_schema.delete(match_data[1]) ? 'up' : 'down'
+              file_list << [status, match_data[1], match_data[2], 'schema']
+            end
           end
         end
 
@@ -173,10 +179,10 @@ namespace :db do
           puts "#{file[0].center(8)} #{file[3].center(8)} #{file[1].ljust(14)}  #{file[2].humanize}"
         end
         db_list_schema.each do |version|
-          puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO SCHEMA FILE ***"
+          puts "#{'up'.center(8)} #{'schema'.center(8)}  #{version.ljust(14)}  *** NO SCHEMA FILE ***"
         end
         db_list_data.each do |version|
-          puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO DATA FILE ***"
+          puts "#{'up'.center(8)} #{'data'.center(8)} #{version.ljust(14)}  *** NO DATA FILE ***"
         end
         puts
       end
@@ -391,5 +397,5 @@ def assure_data_schema_table
 end
 
 def data_migrations_path
-  DataMigrate.config.data_migrations_path
+  DataMigrate.config.data_migrations_paths
 end

@@ -3,7 +3,7 @@ module DataMigrate
     module DataMigrateTasks
       extend self
       def migrations_paths
-        @migrations_paths ||= DataMigrate.config.data_migrations_path
+        @migrations_paths ||= DataMigrate.config.data_migrations_paths
       end
 
       def migrate

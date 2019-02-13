@@ -5,7 +5,7 @@ require "data_migrate/config"
 
 module DataMigrate
   class DataMigrator < ActiveRecord::Migrator
-    self.migrations_paths = [DataMigrate.config.data_migrations_path]
+    self.migrations_paths = DataMigrate.config.data_migrations_paths
 
     def self.assure_data_schema_table
       ActiveRecord::Base.establish_connection(db_config)
